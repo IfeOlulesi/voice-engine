@@ -64,6 +64,7 @@ export default function Home() {
   };
 
   if (authLoading) {
+    console.log(`Home - auth loading: ${authLoading}, user: ${user}`)
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -72,6 +73,7 @@ export default function Home() {
   }
 
   if (user) {
+    console.log(`Home - user: ${user}`)
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="absolute top-4 right-4">

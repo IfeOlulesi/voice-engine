@@ -16,9 +16,18 @@ const firebaseConfig = {
 // Initialize Firebase only if config is available
 let auth: any = null;
 
-if (typeof window !== 'undefined' && firebaseConfig.apiKey) {
-  const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-  auth = getAuth(app);
+if (typeof window !== 'undefined') {
+  if (!firebaseConfig.apiKey) {
+    console.warn('Firebase client not initialized: Missing NEXT_PUBLIC_FIREBASE_API_KEY environment variable');
+  } else {
+    try {
+      const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+      auth = getAuth(app);
+      console.log('Firebase client initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize Firebase client:', error);
+    }
+  }
 }
 
 export { auth };

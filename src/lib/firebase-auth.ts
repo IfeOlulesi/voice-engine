@@ -14,7 +14,7 @@ import { auth } from './firebase-client';
 const googleProvider = new GoogleAuthProvider();
 
 export const signInWithGoogle = async () => {
-  if (!auth) throw new Error('Firebase auth not initialized');
+  if (!auth) throw new Error('Firebase auth not initialized - missing Firebase client configuration');
   
   try {
     const result = await signInWithPopup(auth, googleProvider);
@@ -26,7 +26,7 @@ export const signInWithGoogle = async () => {
 };
 
 export const signInWithEmail = async (email: string, password: string) => {
-  if (!auth) throw new Error('Firebase auth not initialized');
+  if (!auth) throw new Error('Firebase auth not initialized - missing Firebase client configuration');
   
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
@@ -38,7 +38,7 @@ export const signInWithEmail = async (email: string, password: string) => {
 };
 
 export const signUpWithEmail = async (email: string, password: string) => {
-  if (!auth) throw new Error('Firebase auth not initialized');
+  if (!auth) throw new Error('Firebase auth not initialized - missing Firebase client configuration');
   
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -50,7 +50,7 @@ export const signUpWithEmail = async (email: string, password: string) => {
 };
 
 export const logOut = async () => {
-  if (!auth) throw new Error('Firebase auth not initialized');
+  if (!auth) throw new Error('Firebase auth not initialized - missing Firebase client configuration');
   
   try {
     await signOut(auth);
@@ -79,6 +79,11 @@ export const getCurrentUserToken = async () => {
 };
 
 export const onAuthStateChange = (callback: (user: User | null) => void) => {
-  if (!auth) return () => {};
+  console.log(`onAuthStateChange - auth: ${auth}`)
+  if (!auth) {
+    console.warn('Firebase auth not initialized - authentication features will not work. Check Firebase client configuration.');
+    // Return a no-op unsubscribe function to prevent errors
+    return () => {};
+  }
   return onAuthStateChanged(auth, callback);
 };
