@@ -4,7 +4,7 @@ import { linkedInService } from '../../../../../../lib/linkedin';
 export async function GET(request: NextRequest) {
   try {
     // Generate the LinkedIn authorization URL
-    const authUrl = linkedInService.getAuthorizationUrl();
+    const authUrl = linkedInService.getInstance().getAuthorizationUrl();
     
     // Redirect the user to LinkedIn for authorization
     return NextResponse.redirect(authUrl);

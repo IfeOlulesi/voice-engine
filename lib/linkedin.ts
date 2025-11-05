@@ -9,12 +9,15 @@ interface LinkedInPost {
 }
 
 export class LinkedInService {
-  private clientId: string;
-  private clientSecret: string;
-  private redirectUri: string;
+  private clientId?: string;
+  private clientSecret?: string;
+  private redirectUri?: string;
   private accessToken?: string;
+  private initialized = false;
 
-  constructor() {
+  private initialize() {
+    if (this.initialized) return;
+    
     this.clientId = process.env.LINKEDIN_CLIENT_ID!;
     this.clientSecret = process.env.LINKEDIN_CLIENT_SECRET!;
     this.redirectUri = `${process.env.NEXTAUTH_URL || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/auth/linkedin/callback`;
@@ -22,14 +25,17 @@ export class LinkedInService {
     if (!this.clientId || !this.clientSecret) {
       throw new Error('LinkedIn credentials not found in environment variables');
     }
+    
+    this.initialized = true;
   }
 
   getAuthorizationUrl(): string {
+    this.initialize();
     const scopes = ['openid', 'profile', 'email'];
     const params = new URLSearchParams({
       response_type: 'code',
-      client_id: this.clientId,
-      redirect_uri: this.redirectUri,
+      client_id: this.clientId!,
+      redirect_uri: this.redirectUri!,
       state: Math.random().toString(36).substring(7),
       scope: scopes.join(' ')
     });
@@ -38,13 +44,14 @@ export class LinkedInService {
   }
 
   async exchangeCodeForToken(code: string): Promise<string> {
+    this.initialize();
     try {
       const response = await axios.post('https://www.linkedin.com/oauth/v2/accessToken', {
         grant_type: 'authorization_code',
         code,
-        redirect_uri: this.redirectUri,
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
+        redirect_uri: this.redirectUri!,
+        client_id: this.clientId!,
+        client_secret: this.clientSecret!,
       }, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -64,6 +71,7 @@ export class LinkedInService {
   }
 
   async getUserProfile(): Promise<any> {
+    this.initialize();
     if (!this.accessToken) {
       throw new Error('Access token not set');
     }
@@ -88,6 +96,7 @@ export class LinkedInService {
   }
 
   async getRecentPosts(_limit: number = 10): Promise<LinkedInPost[]> {
+    this.initialize();
     if (!this.accessToken) {
       throw new Error('Access token not set');
     }
@@ -121,6 +130,7 @@ export class LinkedInService {
   }
 
   async sharePost(text: string): Promise<any> {
+    this.initialize();
     if (!this.accessToken) {
       throw new Error('Access token not set');
     }
@@ -161,4 +171,13 @@ export class LinkedInService {
   }
 }
 
-export const linkedInService = new LinkedInService();
+let linkedInServiceInstance: LinkedInService | null = null;
+
+export const linkedInService = {
+  getInstance(): LinkedInService {
+    if (!linkedInServiceInstance) {
+      linkedInServiceInstance = new LinkedInService();
+    }
+    return linkedInServiceInstance;
+  }
+} as const;

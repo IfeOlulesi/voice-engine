@@ -23,13 +23,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Exchange the authorization code for an access token
-    const accessToken = await linkedInService.exchangeCodeForToken(code);
+    const accessToken = await linkedInService.getInstance().exchangeCodeForToken(code);
 
     // Set the access token in the service
-    linkedInService.setAccessToken(accessToken);
+    linkedInService.getInstance().setAccessToken(accessToken);
 
     // Get user profile to verify the token works
-    const profile = await linkedInService.getUserProfile();
+    const profile = await linkedInService.getInstance().getUserProfile();
 
     // Redirect back to dashboard with access token and profile data
     const dashboardUrl = new URL('/dashboard', request.url);

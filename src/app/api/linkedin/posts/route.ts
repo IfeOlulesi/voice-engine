@@ -16,10 +16,10 @@ export async function GET(request: NextRequest) {
     }
     
     // Set the access token for the LinkedIn service
-    linkedInService.setAccessToken(accessToken);
+    linkedInService.getInstance().setAccessToken(accessToken);
     
     // Fetch recent posts from LinkedIn
-    const linkedInPosts = await linkedInService.getRecentPosts(limit);
+    const linkedInPosts = await linkedInService.getInstance().getRecentPosts(limit);
     
     return NextResponse.json({
       success: true,
