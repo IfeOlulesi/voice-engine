@@ -35,6 +35,13 @@ ENV NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=$NEXT_PUBLIC_FIREBASE_MESSAGING_SEN
 ENV NEXT_PUBLIC_FIREBASE_APP_ID=$NEXT_PUBLIC_FIREBASE_APP_ID
 ENV NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=$NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 
+# Debug: Print environment variables (will show in Cloud Build logs)
+RUN echo "=== Firebase Config Debug ===" && \
+    echo "API_KEY length: ${#NEXT_PUBLIC_FIREBASE_API_KEY}" && \
+    echo "AUTH_DOMAIN: $NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN" && \
+    echo "PROJECT_ID: $NEXT_PUBLIC_FIREBASE_PROJECT_ID" && \
+    echo "=== End Debug ==="
+
 # Build the application
 RUN npm run build
 
